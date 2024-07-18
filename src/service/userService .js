@@ -1,7 +1,8 @@
-const { User, Blog } = require("../model/userSchema");
+const { User } = require("../model/userSchema");
+const { Blog } = require("../model/blogSchema");
 const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('blogs');
     res.status(200).json(users);
   } catch (e) {
     res.status(400).json({ error: error.message });
@@ -10,7 +11,7 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).populate('blogs');
     res.status(200).json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -47,7 +48,9 @@ const updateUser = async (req, res) => {
 const updateUserByEmail = async (req, res) => {
   try {
     const { email } = req.params;
-    const user = await User.findOneAndUpdate({ email }, req.body);
+    const user = await User.findOneAndUpdate({ email }, req.body, {
+      new: true,
+    });
     res.status(200).json({ user, message: "User updated successfully" });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });

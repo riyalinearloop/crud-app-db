@@ -33,32 +33,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Blog schema
-const blogSchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "User",
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    desc: {
-      type: String,
-      required: false,
-    },
-  },
-  {
-    versionKey: false,
-    timestamps: true,
-  }
-);
-
 // Create models
 const User = mongoose.model("User", userSchema);
-const Blog = mongoose.model("Blog", blogSchema);
 
-// Export both models
-module.exports = { User, Blog };
+module.exports = { User };

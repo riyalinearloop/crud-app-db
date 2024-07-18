@@ -1,12 +1,14 @@
 const express = require("express");
-const connectDB = require("./config/dbConnection");
-const userRoutes = require("./routes/userRoute");
+const connectDB = require("./src/config/dbConnection");
+const userRoutes = require("./src/routes/userRoute");
+const blogRoutes = require("./src/routes/blogRoute");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use("/api/user", userRoutes);
+app.use("/api/blogs", blogRoutes);
 
 //Connect to MongoDB Database
 connectDB()
