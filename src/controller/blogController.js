@@ -32,17 +32,27 @@ const getBlogsByStatus = async (req, res) => {
   }
 };
 
-const getBlogsByCommon = async (req, res) => {
+const getBlogsByStatusAndUser = async (req, res) => {
   try {
-    await blogService.getCommonBlogs(req, res);
+    await blogService.getBlogsByStatusAndUser(req, res);
   } catch (error) {
     res.status(400).json({ error: error?.message });
   }
 };
+
+const deleteBlog = async (req, res) => {
+  try {
+    await blogService.deleteBlog(req, res);
+  } catch (error) {
+    res.status(400).json({ error: error?.message });
+  }
+};
+
 module.exports = {
   getBlogs,
   getAllBlogsByUserId,
   updateStatus,
   getBlogsByStatus,
-  getBlogsByCommon,
+  getBlogsByStatusAndUser,
+  deleteBlog,
 };

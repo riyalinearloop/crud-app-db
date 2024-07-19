@@ -21,7 +21,11 @@ const blogSchema = new mongoose.Schema(
     status: {
       type: String,
       default: STATUS?.IN_DRAFT,
-    }
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     versionKey: false,

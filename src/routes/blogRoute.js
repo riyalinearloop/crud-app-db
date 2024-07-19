@@ -4,10 +4,11 @@ const blogController = require("../controller/blogController");
 const router = express.Router();
 
 router.get("/", blogController.getBlogs);
-router.get("/userHasBlogs", blogController.getBlogsByCommon);
+router.get("/filter", blogController.getBlogsByStatusAndUser);
 router.get("/:userId", blogController.getAllBlogsByUserId);
-router.put("/:id/status", blogController.updateStatus);
-// router.get("/user/:userId/status/:status", blogController.getBlogsByStatus);
 router.get("/user/:userId", blogController.getBlogsByStatus);
+router.put("/:id/status", blogController.updateStatus);
+router.delete("/:id", blogController.deleteBlog);
+// router.get("/user/:userId/status/:status", blogController.getBlogsByStatus);
 
 module.exports = router;

@@ -3,7 +3,7 @@ const { Blog } = require("../model/blogSchema");
 const { User } = require("../model/userSchema");
 const getAllBlogs = async (req, res) => {
   try {
-    const allBlogs = await Blog.find();
+    const allBlogs = await Blog.find({ isDeleted: false });
     res.status(200).json(allBlogs);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
@@ -70,42 +70,63 @@ const getBlogsByStatus = async (req, res) => {
   }
 };
 
-const getCommonBlogs = async (req, res) => {
+const getBlogsByStatusAndUser = async (req, res) => {
   const { status, userId } = req.query;
-  console.log("status, userId: ", status, userId);
 
   try {
-    let whereQuery = {};
+    const queryConditions = {
+      isDeleted: false,
+    };
+
     if (userId) {
-      whereQuery = {
-        userId: userId,
-      };
-      const userExist = await User.findById(userId);
-      if (!userExist) {
-        res.status(400).json({ error: "User not found" });
+      const userExists = await User.findById(userId);
+      if (!userExists) {
+        return res.status(404).json({ error: "User not found" });
       }
+      queryConditions.userId = userId;
     }
+
     if (status) {
       if (!Object.values(STATUS).includes(status)) {
-        throw new Error("Invalid status");
+        return res.status(400).json({ error: "Invalid status" });
       }
-      whereQuery = {
-        ...whereQuery,
-        status: status,
-      };
+      queryConditions.status = status;
     }
+    const blogs = await Blog.find(queryConditions);
 
-    console.log("whereQuery: ", whereQuery);
-    const blogs = await Blog.find(whereQuery);
-
-    if (!blogs.length) {
+    if (blogs.length === 0) {
       return res
         .status(404)
-        .json({ error: "No blogs found with the specified status" });
+        .json({ error: "No blogs found matching the specified criteria" });
     }
-    res.status(200).json({ length: blogs?.length, blogs: blogs });
+
+    res.status(200).json({ count: blogs.length, blogs: blogs });
   } catch (error) {
-    res.status(500).json({ error: "Internal server error." });
+    console.error("Error in getBlogsByStatusAndUser:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const deleteBlog = async (req, res) => {
+  try {
+    const blogExist = await Blog.findById(req.params.id);
+    if (!blogExist) {
+      res.status(400).json({ error: "Blog is not found" });
+    } else {
+      await Blog.findByIdAndUpdate(req.params.id, { isDeleted: true });
+      res.status(200).json({ message: true });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const commonController = async (req, res) => {
+  try {
+    await Blog.updateMany({}, { $set: { isDeleted: false } });
+    res.status(200).json({ message: "Success" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -114,5 +135,7 @@ module.exports = {
   getBlogByUserId,
   changeStatus,
   getBlogsByStatus,
-  getCommonBlogs,
+  getBlogsByStatusAndUser,
+  deleteBlog,
+  commonController,
 };
