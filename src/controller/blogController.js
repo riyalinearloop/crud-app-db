@@ -42,7 +42,7 @@ const getBlogsByStatusAndUser = async (req, res) => {
 
 const deleteBlog = async (req, res) => {
   try {
-    await blogService.deleteBlog(req, res);
+    await blogService.softDeleteBlog(req, res);
   } catch (error) {
     res.status(400).json({ error: error?.message });
   }
