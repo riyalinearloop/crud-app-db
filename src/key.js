@@ -4,6 +4,14 @@ const STATUS = Object.freeze({
   PUBLISH: "publish",
 });
 
+const CATEGORY = Object.freeze({
+  DEV: "dev",
+  DEVOPS: "devops",
+  PROD: "prod",
+  STAG: "stag",
+  UI: "ui",
+});
+
 const COMMON_MESS = {
   INTERNAL_ERROR: "Internal Server Error",
   WENT_WRONG: "Something went wrong!",
@@ -33,4 +41,4 @@ const BlogMessage = {
   },
 };
 
-module.exports = { STATUS, COMMON_MESS, UserMessage, BlogMessage };
+module.exports = { STATUS, COMMON_MESS, UserMessage, BlogMessage, CATEGORY };

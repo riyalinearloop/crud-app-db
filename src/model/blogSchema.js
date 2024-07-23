@@ -26,6 +26,12 @@ const blogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    cats: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
   },
   {
     versionKey: false,

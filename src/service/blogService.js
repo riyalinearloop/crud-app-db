@@ -72,9 +72,11 @@ const getBlogsByStatus = async (req, res) => {
 };
 
 const getBlogsByStatusAndUser = async (req, res) => {
-  const { status, userId } = req.query;
-  const { isExcluded } = req.body;
-  const statusArray = status.split(",");
+  const { status, userId, statusExcluded } = req.query;
+  let statusArray;
+  if (status) {
+    statusArray = status.split(",");
+  }
 
   try {
     const queryConditions = {
@@ -100,9 +102,9 @@ const getBlogsByStatusAndUser = async (req, res) => {
           .json({ error: BlogMessage.BLOG_MESS.INVALID_STATUS });
       }
 
-      queryConditions.status = isExcluded
-        ? { $nin: statusArray }
-        : { $in: statusArray };
+      queryConditions.status = statusExcluded === "true"
+        ? { $in: statusArray }
+        : { $nin: statusArray };
     }
     const blogs = await Blog.find(queryConditions);
 
