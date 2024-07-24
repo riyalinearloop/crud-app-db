@@ -48,6 +48,21 @@ const deleteBlog = async (req, res) => {
   }
 };
 
+const addCategoryToBlog = async (req, res) => {
+  try {
+    await blogService.addCategory(req, res);
+  } catch (error) {
+    res.status(400).json({ error: error?.message });
+  }
+};
+const getBlogsByCategory = async (req, res) => {
+  try {
+    await blogService.getBlogsByCategory(req, res);
+  } catch (error) {
+    res.status(400).json({ error: error?.message });
+  }
+};
+
 module.exports = {
   getBlogs,
   getAllBlogsByUserId,
@@ -55,4 +70,6 @@ module.exports = {
   getBlogsByStatus,
   getBlogsByStatusAndUser,
   deleteBlog,
+  addCategoryToBlog,
+  getBlogsByCategory,
 };

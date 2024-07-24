@@ -26,10 +26,10 @@ const blogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    cats: [
+    categories: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Blog",
+        ref: "Category",
       },
     ],
   },

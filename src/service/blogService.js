@@ -1,7 +1,15 @@
 const mongoose = require("mongoose");
-const { STATUS, COMMON_MESS, BlogMessage, UserMessage } = require("../key");
+const {
+  STATUS,
+  COMMON_MESS,
+  BlogMessage,
+  UserMessage,
+  validId,
+  CategoryMessage,
+} = require("../key");
 const { Blog } = require("../model/blogSchema");
 const { User } = require("../model/userSchema");
+const { Category } = require("../model/categorySchema");
 const getAllBlogs = async (req, res) => {
   try {
     const allBlogs = await Blog.find({ isDeleted: false });
@@ -102,9 +110,10 @@ const getBlogsByStatusAndUser = async (req, res) => {
           .json({ error: BlogMessage.BLOG_MESS.INVALID_STATUS });
       }
 
-      queryConditions.status = statusExcluded === "true"
-        ? { $in: statusArray }
-        : { $nin: statusArray };
+      queryConditions.status =
+        statusExcluded === "true"
+          ? { $in: statusArray }
+          : { $nin: statusArray };
     }
     const blogs = await Blog.find(queryConditions);
 
@@ -146,6 +155,92 @@ const commonController = async (req, res) => {
   }
 };
 
+const validateCategories = async (categories) => {
+  console.log("categories: ", categories);
+  const validCategories = await Category.find({ _id: { $in: categories } });
+  console.log("validCategories: ", validCategories);
+  return validCategories.length === categories.length;
+};
+
+const addCategory = async (req, res) => {
+  try {
+    const blogId = req.params.id;
+    const { cats } = req.body;
+
+    const isValidBlogId = validId(blogId);
+    if (!isValidBlogId) {
+      return res.status(404).json({ error: COMMON_MESS.VALID_ID });
+    }
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return res.status(404).json({ error: BlogMessage.BLOG_MESS.NOT_FOUND });
+    } else {
+      const invalidCategoryIds = cats.filter((cat) => !validId(cat));
+      if (invalidCategoryIds.length > 0) {
+        return res.status(400).json({
+          error: CategoryMessage?.CATEGORY_MESSAGE.INVALID_ID,
+        });
+      }
+      const isValidCategory = await validateCategories(cats);
+      if (!isValidCategory) {
+        return res
+          .status(400)
+          .json({ error: BlogMessage.BLOG_MESS.INVALID_CAT });
+      }
+      const catId = cats.filter(
+        (catId) =>
+          !blog.categories.some(
+            (blogCatId) => blogCatId.toString() === catId.toString()
+          )
+      );
+      blog.categories.push(...catId);
+      await blog.save();
+      res
+        .status(200)
+        .json({ blog, message: CategoryMessage?.CATEGORY_MESSAGE.ADDED });
+    }
+  } catch (error) {
+    res.status(500).json({ error: COMMON_MESS.INTERNAL_ERROR });
+  }
+};
+
+//find the blogs by category Id
+const getBlogsByCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+    let catArr;
+    if (category) {
+      catArr = category.split(",");
+    }
+    const query = {
+      isDeleted: false,
+    };
+    if (catArr?.length > 0) {
+      // console.log("catArr: ", catArr);
+      // const isValidCategory = validateCategories(catArr);
+
+      // if (!isValidCategory) {
+      //   return res
+      //     .status(400)
+      //     .json({ error: CategoryMessage.CATEGORY_MESSAGE.INVALID_ID });
+      // }
+
+      query.categories = { $in: catArr };
+    }
+    const blogs = await Blog.find(query);
+
+    if (blogs.length === 0) {
+      return res
+        .status(404)
+        .json({ error: BlogMessage.BLOG_MESS.INVALID_STATUS_BLOG });
+    }
+
+    res.status(200).json({ count: blogs.length, blogs: blogs });
+  } catch (error) {
+    res.status(500).json({ error: COMMON_MESS.INTERNAL_ERROR });
+  }
+};
+
 module.exports = {
   getAllBlogs,
   getBlogByUserId,
@@ -154,4 +249,7 @@ module.exports = {
   getBlogsByStatusAndUser,
   softDeleteBlog,
   commonController,
+  addCategory,
+  getBlogsByCategory,
+  getBlogsByCategory,
 };

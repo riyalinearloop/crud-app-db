@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const STATUS = Object.freeze({
   IN_DRAFT: "in_draft",
   RIGHT: "right",
@@ -5,11 +7,11 @@ const STATUS = Object.freeze({
 });
 
 const CATEGORY = Object.freeze({
-  DEV: "dev",
-  DEVOPS: "devops",
-  PROD: "prod",
-  STAG: "stag",
-  UI: "ui",
+  DEV: "Dev",
+  DEVOPS: "Devops",
+  PROD: "Prod",
+  STAG: "Stag",
+  UI: "Ui",
 });
 
 const COMMON_MESS = {
@@ -36,9 +38,33 @@ const BlogMessage = {
     BLOG_DELETE: "Blog deleted successfully",
     BLOG_UPDATE: "Blog updated successfully",
     INVALID_STATUS: "Invalid Status",
+    INVALID_CAT: "Category is not valid.",
     BLOG_ALREADY_DELETED: "Blog is already deleted",
     INVALID_STATUS_BLOG: "No blogs found with the specified status",
   },
 };
 
-module.exports = { STATUS, COMMON_MESS, UserMessage, BlogMessage, CATEGORY };
+const CategoryMessage = {
+  CATEGORY_MESSAGE: {
+    INVALID_ID: "Invalid category ID",
+    ADDED: "Category(s) added into blog",
+  },
+};
+
+const validId = (id) => {
+  let isValidId = false;
+  if (id) {
+    isValidId = mongoose.Types.ObjectId.isValid(id);
+  }
+  return isValidId;
+};
+
+module.exports = {
+  STATUS,
+  COMMON_MESS,
+  UserMessage,
+  BlogMessage,
+  CATEGORY,
+  validId,
+  CategoryMessage,
+};
