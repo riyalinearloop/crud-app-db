@@ -10,6 +10,7 @@ const {
 const { Blog, BlogView } = require("../model/blogSchema");
 const { User } = require("../model/userSchema");
 const { Category } = require("../model/categorySchema");
+const sendMail = require("../config/mailConnection");
 const getAllBlogs = async (req, res) => {
   try {
     const allBlogs = await Blog.find({ isDeleted: false });
@@ -44,6 +45,9 @@ const changeStatus = async (req, res) => {
         { status },
         { new: true }
       );
+      if (updatedBlog?.status === STATUS.PUBLISH) {
+        sendMail();
+      }
       res
         .status(200)
         .json({ updatedBlog, message: BlogMessage.BLOG_MESS.BLOG_UPDATE });

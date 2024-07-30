@@ -12,7 +12,15 @@ db.once("open", async () => {
 
 // Function to initialize categories
 const initializeCategories = async () => {
-  const categoryNames = ["Dev", "Devops", "Prod", "Stag", "Ui", "HealthCare", "AI-ML"];
+  const categoryNames = [
+    "Dev",
+    "Devops",
+    "Prod",
+    "Stag",
+    "Ui",
+    "HealthCare",
+    "AI-ML",
+  ];
 
   try {
     for (const name of categoryNames) {
