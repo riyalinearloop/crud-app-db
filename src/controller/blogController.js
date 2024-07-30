@@ -63,6 +63,14 @@ const getBlogsByCategory = async (req, res) => {
   }
 };
 
+const getBlogsBySearch = async (req, res) => {
+  try {
+    await blogService.getBlogsBySearch(req, res);
+  } catch (error) {
+    res.status(400).json({ error: error?.message });
+  }
+};
+
 module.exports = {
   getBlogs,
   getAllBlogsByUserId,
@@ -72,4 +80,5 @@ module.exports = {
   deleteBlog,
   addCategoryToBlog,
   getBlogsByCategory,
+  getBlogsBySearch,
 };
